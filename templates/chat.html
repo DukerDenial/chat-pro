@@ -3,17 +3,36 @@
 {% block content %}
 <h2>Привет, {{ current_user.username }}</h2>
 <a href="{{ url_for('logout') }}">Выйти</a>
-<h3>Пользователи:</h3>
-<ul>
-{% for user in users %}
-  <li>{{ user.username }} {% if user.online %}(online){% endif %}</li>
-{% endfor %}
-</ul>
+<a href="{{ url_for('friends') }}">Друзья</a>
+<a href="{{ url_for('add_friend') }}">Добавить друга</a>
+<div id="user-list">
+  <h3>Пользователи:</h3>
+  <ul>
+  {% for user in users %}
+    <li>{{ user.username }} {% if user.online %}(online){% endif %}</li>
+  {% endfor %}
+  </ul>
+</div>
 <div id="chat-box"></div>
-<input type="text" id="message-input">
+<input type="text" id="message-input" placeholder="Введите сообщение">
 <button id="send-btn">Отправить</button>
+
 <script>
 const socket = io();
 const currentUserId = {{ current_user.id }};
+
+document.getElementById("send-btn").addEventListener("click", () => {
+    const text = document.getElementById("message-input").value;
+    const receiver_id = prompt("Введите ID пользователя для отправки");
+    socket.emit("send_message", {text, receiver_id});
+    document.getElementById("message-input").value = "";
+});
+
+socket.on("receive_message", (data) => {
+    const box = document.getElementById("chat-box");
+    const msg = document.createElement("div");
+    msg.textContent = data.sender_id + ": " + data.text;
+    box.appendChild(msg);
+});
 </script>
 {% endblock %}

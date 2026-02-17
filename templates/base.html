@@ -4,11 +4,14 @@
 <meta charset="UTF-8">
 <title>{% block title %}Messenger{% endblock %}</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 </head>
 <body class="dark">
+<div class="background"></div>
 {% with messages = get_flashed_messages() %}
   {% if messages %}
-    <ul>
+    <ul class="flashes">
       {% for message in messages %}
         <li>{{ message }}</li>
       {% endfor %}
@@ -16,7 +19,5 @@
   {% endif %}
 {% endwith %}
 {% block content %}{% endblock %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
-<script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Добавить друга{% endblock %}
+{% block content %}
+<h2>Добавить друга по номеру телефона</h2>
+<form method="post">
+<input type="text" name="phone" placeholder="Номер телефона" required>
+<button type="submit">Отправить запрос</button>
+</form>
+<a href="{{ url_for('friends') }}">Вернуться к друзьям</a>
+{% endblock %}

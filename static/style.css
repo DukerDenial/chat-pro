@@ -1,0 +1,54 @@
+body.dark {
+    font-family: 'Noto Sans JP', sans-serif;
+    background-color: #1e1e2f;
+    color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+
+.background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("{{ url_for('static', filename='japanese_bg.jpg') }}");
+    background-size: cover;
+    background-position: center;
+    opacity: 0.2;
+    z-index: -1;
+}
+
+.flashes {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    list-style: none;
+    padding: 0;
+}
+
+.flashes li {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    padding: 10px 20px;
+    margin-bottom: 5px;
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+}
+form input, form button {
+    padding: 10px;
+    margin: 5px;
+    border-radius: 5px;
+    border: none;
+}
+
+form button {
+    background-color: #f76c6c;
+    color: white;
+    cursor: pointer;
+}
+
+ul li {
+    margin: 5px 0;
+}

@@ -54,6 +54,14 @@ class FriendRequest(db.Model):
     receiver_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     status = db.Column(db.String(20), default="pending")  # pending, accepted, rejected
 
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(150), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    phone = db.Column(db.String(20), unique=True, nullable=True)  # номер телефона
+    online = db.Column(db.Boolean, default=False)
+
+
 # ---------------------------
 # LOGIN MANAGER
 # ---------------------------
@@ -64,6 +72,26 @@ def load_user(user_id):
 # ---------------------------
 # ROUTES
 # ---------------------------
+@app.route("/add_friend", methods=["GET", "POST"])
+@login_required
+def add_friend():
+    if request.method == "POST":
+        phone = request.form.get("phone")
+        friend = User.query.filter_by(phone=phone).first()
+        if not friend:
+            flash("Пользователь с таким номером не найден")
+            return redirect(url_for("add_friend"))
+        # Проверяем, нет ли уже запроса
+        existing = FriendRequest.query.filter_by(sender_id=current_user.id, receiver_id=friend.id).first()
+        if existing:
+            flash("Запрос уже отправлен")
+            return redirect(url_for("friends"))
+        fr = FriendRequest(sender_id=current_user.id, receiver_id=friend.id)
+        db.session.add(fr)
+        db.session.commit()
+        flash("Запрос отправлен!")
+        return redirect(url_for("friends"))
+    return render_template("add_friend.html")
 
 @app.route("/")
 def index():
