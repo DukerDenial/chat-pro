@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>Все пользователи</h3>
+
+<ul class="list-group">
+{% for user in users %}
+<li class="list-group-item">
+    {{ user.username }}
+    <a href="/add_friend/{{ user.id }}"
+       class="btn btn-sm btn-primary float-end">
+        Добавить в друзья
+    </a>
+</li>
+{% endfor %}
+</ul>
+
+{% endblock %}

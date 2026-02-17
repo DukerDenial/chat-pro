@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row" style="height:75vh;">
+    <h5>Заявки в друзья</h5>
+
+{% for req in requests %}
+<div class="card p-2 mb-2">
+    Пользователь {{ req.sender_id }}
+    <a href="/accept_friend/{{ req.id }}"
+       class="btn btn-sm btn-success">Принять</a>
+    <a href="/decline_friend/{{ req.id }}"
+       class="btn btn-sm btn-danger">Отклонить</a>
+</div>
+{% endfor %}
+
+  <div class="col-4 border-end overflow-auto">
+    <h5>Друзья</h5>
+
+<ul class="list-group mb-4">
+{% for user in friends %}
+<li class="list-group-item"
+    onclick="openChat({{ user.id }}, '{{ user.username }}')">
+    {{ user.username }}
+    <span id="status-{{ user.id }}"
+          class="badge bg-secondary float-end">
+        offline
+    </span>
+</li>
+{% endfor %}
+</ul>
+
+  </div>
+
+  <!-- CHAT -->
+  <div class="col-8 d-flex flex-column">
+    <div id="chat-box" class="flex-grow-1 border p-3 mb-2 overflow-auto">
+      <h5 id="chat-title">Выберите пользователя</h5>
+    </div>
+
+    <div class="input-group">
+      <input id="message" class="form-control" placeholder="Введите сообщение">
+      <button onclick="sendMessage()" class="btn btn-primary">
+        Отправить
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let socket = io();
+let currentChatUser = null;
+
+function openChat(userId, username) {
+  currentChatUser = userId;
+  document.getElementById("chat-title").innerText = "Чат с " + username;
+  document.getElementById("chat-box").innerHTML = "";
+
+  fetch("/messages/" + userId)
+  .then(res => res.json())
+  .then(data => {
+    data.forEach(msg => {
+      addMessage(msg.sender_id, msg.text, msg.time);
+    });
+  });
+}
+
+function sendMessage() {
+  let message = document.getElementById("message").value;
+  if (!currentChatUser || message.trim() === "") return;
+
+  socket.emit("send_private", {
+    receiver_id: currentChatUser,
+    message: message
+  });
+
+  document.getElementById("message").value = "";
+}
+
+socket.on("receive_private", function(data) {
+  if (data.sender_id === currentChatUser ||
+      data.receiver_id === currentChatUser) {
+    addMessage(data.sender_id, data.message, data.time);
+  }
+});
+
+socket.on("online_users", function(users) {
+  document.querySelectorAll("[id^='status-']").forEach(el => {
+    el.classList.remove("bg-success");
+    el.classList.add("bg-secondary");
+    el.innerText = "offline";
+  });
+
+  users.forEach(id => {
+    let badge = document.getElementById("status-" + id);
+    if (badge) {
+      badge.classList.remove("bg-secondary");
+      badge.classList.add("bg-success");
+      badge.innerText = "online";
+    }
+  });
+});
+
+function addMessage(senderId, text, time) {
+  let box = document.getElementById("chat-box");
+  let div = document.createElement("div");
+  div.innerHTML = `
+    <div class="mb-2">
+      <small class="text-muted">${time}</small>
+      <div class="p-2 rounded ${senderId == {{ current_user.id }} ? 'bg-primary text-white' : 'bg-secondary text-white'}">
+        ${text}
+      </div>
+    </div>
+  `;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+</script>
+
+{% endblock %}

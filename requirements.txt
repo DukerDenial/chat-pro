@@ -1,0 +1,9 @@
+flask
+flask-sqlalchemy
+flask-login
+flask-socketio
+eventlet
+werkzeug
+gunicorn
+psycopg2-binary
+

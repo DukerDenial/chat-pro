@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card p-4 shadow mx-auto" style="max-width:400px;">
+  <h3 class="mb-3">Вход</h3>
+
+  <form method="POST">
+    <input name="username" class="form-control mb-3" placeholder="Имя пользователя" required>
+    <input name="password" type="password" class="form-control mb-3" placeholder="Пароль" required>
+    <button class="btn btn-primary w-100">Войти</button>
+  </form>
+
+  <a href="/register" class="d-block mt-3 text-center">
+    Нет аккаунта? Зарегистрироваться
+  </a>
+</div>
+{% endblock %}
