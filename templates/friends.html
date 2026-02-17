@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Friends{% endblock %}
+{% block content %}
+<h2>Запросы в друзья</h2>
+<ul>
+{% for req in requests %}
+  <li>{{ req.sender_id }}</li>
+{% endfor %}
+</ul>
+{% endblock %}
