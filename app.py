@@ -4,6 +4,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from flask_socketio import SocketIO, emit, join_room
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from app import db, app
 import os
 
 app = Flask(__name__, instance_relative_config=True)
@@ -31,12 +32,13 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
 
-class FriendRequest(db.Model):
+class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sender_id = db.Column(db.Integer, nullable=False)
     receiver_id = db.Column(db.Integer, nullable=False)
-    status = db.Column(db.String(20), default="pending")
-    # pending / accepted / declined
+    text = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
