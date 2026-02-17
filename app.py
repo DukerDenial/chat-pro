@@ -36,12 +36,18 @@ login_manager.login_view = "login"
 # MODELS
 # ---------------------------
 class User(UserMixin, db.Model):
+    __tablename__ = "user"
+    __table_args__ = {'extend_existing': True}  # <- добавляем это
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
+    phone = db.Column(db.String(20), unique=True, nullable=True)
     online = db.Column(db.Boolean, default=False)
 
+
 class Message(db.Model):
+    __tablename__ = "message"
+    __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     sender_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     receiver_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
@@ -49,18 +55,12 @@ class Message(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 class FriendRequest(db.Model):
+    __tablename__ = "FriendRequest"
+    __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     sender_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     receiver_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     status = db.Column(db.String(20), default="pending")  # pending, accepted, rejected
-
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(150), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False)
-    phone = db.Column(db.String(20), unique=True, nullable=True)  # номер телефона
-    online = db.Column(db.Boolean, default=False)
-
 
 # ---------------------------
 # LOGIN MANAGER
@@ -182,5 +182,6 @@ def handle_message(data):
 # ---------------------------
 if __name__ == "__main__":
     with app.app_context():
-        db.create_all()  # создаёт таблицы автоматически
-    socketio.run(app, host="0.0.0.0", port=5000)
+        db.create_all()
+    port = int(os.environ.get("PORT", 5000))  # берём порт из Render
+    socketio.run(app, host="0.0.0.0", port=port)
